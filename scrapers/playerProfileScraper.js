@@ -90,11 +90,25 @@ function parseProfile($) {
 
 /**
  * Parse per_game table (Regular Season only) into season rows.
- * Each row: season "2003-04", team_id "CLE", pos, g, gs, mp, pts_per_g, trb_per_g, ast_per_g, stl_per_g, blk_per_g, fg_pct, fg3_pct, ft_pct
- * We need totals: games, minutes, points, rebounds, assists, steals, blocks, fg_pct, three_pct, ft_pct
- * Totals table is more accurate; if not present we use per_game * g for points, trb, ast, stl, blk and mp from totals or per_game*g.
+ * Basketball-Reference often puts the table inside an HTML comment; parseSeasonRowsFromTable
+ * runs on the main doc, and parseSeasonRowsFromComments extracts from <!-- ... --> if needed.
  */
-function parseSeasonRows($) {
+function parseSeasonRowsFromComments(rawHtml) {
+  const commentRegex = /<!--([\s\S]*?)-->/g;
+  let match;
+  while ((match = commentRegex.exec(rawHtml)) !== null) {
+    const commentContent = match[1];
+    if (!commentContent.includes('per_game') && !commentContent.includes('data-stat="season"')) continue;
+    try {
+      const $ = cheerio.load(commentContent);
+      const rows = parseSeasonRowsFromTable($);
+      if (rows.length > 0) return rows;
+    } catch (_) {}
+  }
+  return [];
+}
+
+function parseSeasonRowsFromTable($) {
   const rows = [];
   const $table = $('table#per_game');
   if (!$table.length) return rows;
@@ -183,9 +197,12 @@ export async function scrapePlayerProfile(url) {
   const $ = cheerio.load(html);
 
   const profile = parseProfile($);
-  const seasons = parseSeasonRows($);
+  let seasons = parseSeasonRowsFromTable($);
+  if (seasons.length === 0) {
+    seasons = parseSeasonRowsFromComments(html);
+  }
 
   return { sr_player_id: srPlayerId, profile, seasons, url };
 }
 
-export default { fetchPlayerProfileHtml, scrapePlayerProfile, parseProfile, parseSeasonRows };
+export default { fetchPlayerProfileHtml, scrapePlayerProfile, parseProfile, parseSeasonRowsFromTable, parseSeasonRowsFromComments };
