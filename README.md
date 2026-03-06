@@ -68,9 +68,9 @@ jobs/         # generatePlayerJobs, runPlayerWorkers
 | `npm run generate-jobs` | Enqueue all player URLs from index   |
 | `npm run workers`    | Run a single worker (run multiple for concurrency) |
 
-## Railway: "column url does not exist"
+## Railway: player_scrape_jobs schema
 
-If the worker crashes with **column \"url\" does not exist**, your Postgres is missing the `player_scrape_jobs` table or it has the wrong columns. Either:
+The scraper expects `player_scrape_jobs` to have: **id**, **player_url**, **status**, **attempts**, **last_error**, **created_at**, **updated_at**. It does not modify the database; it only reads and writes using this structure.
 
 1. **Run the full migration** (creates all tables): connect to your Railway Postgres and run the SQL in `db/schema.sql`, or run `npm run migrate` locally with `DATABASE_URL` set to your Railway Postgres URL.
 2. **Create/fix only the jobs table**: run the SQL in `db/fix-player-scrape-jobs.sql` against your Railway Postgres (Option A creates the table; Option B adds missing columns to an existing table).
