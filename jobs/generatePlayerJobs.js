@@ -1,8 +1,7 @@
 /**
  * Generate player scrape jobs: fetch all player URLs from Basketball Reference index
  * and insert into player_scrape_jobs with status 'pending'.
- * Uses existing schema: player_url, status, etc.
- * If player_url has a UNIQUE constraint, duplicate URLs will be skipped (23505).
+ * Uses player_url or url column depending on existing schema.
  */
 
 import 'dotenv/config';
@@ -14,12 +13,32 @@ async function generateJobs() {
   const urls = await fetchPlayerUrlsFromIndex();
   console.log(`Found ${urls.length} player URLs.`);
 
+  let urlColumn = null;
+  try {
+    await pool.query('SELECT id, player_url FROM player_scrape_jobs LIMIT 1');
+    urlColumn = 'player_url';
+    console.log('Using column: player_url');
+  } catch (err) {
+    if (err.code === '42703') {
+      try {
+        await pool.query('SELECT id, url FROM player_scrape_jobs LIMIT 1');
+        urlColumn = 'url';
+        console.log('Using column: url');
+      } catch (e) {
+        await pool.end();
+        throw new Error('player_scrape_jobs must have a player_url or url column.');
+      }
+    } else {
+      throw err;
+    }
+  }
+
   let inserted = 0;
   let skipped = 0;
   for (const url of urls) {
     try {
       await pool.query(
-        `INSERT INTO player_scrape_jobs (player_url, status) VALUES ($1, 'pending')`,
+        `INSERT INTO player_scrape_jobs (${urlColumn}, status) VALUES ($1, 'pending')`,
         [url]
       );
       inserted++;
@@ -28,7 +47,7 @@ async function generateJobs() {
         skipped++;
       } else if (err.code === '42703') {
         await pool.end();
-        throw new Error('player_scrape_jobs table must have a player_url column.');
+        throw new Error(`player_scrape_jobs table must have a ${urlColumn} column.`);
       } else {
         throw err;
       }
