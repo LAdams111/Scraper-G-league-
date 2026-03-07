@@ -1,48 +1,48 @@
 import { pool } from '../db/db.js';
 
-const NBA_LEAGUE_NAME = 'NBA';
-let nbaLeagueId = null;
+const G_LEAGUE_NAME = 'G League';
+let gLeagueId = null;
 
-export async function getNbaLeagueId() {
-  if (nbaLeagueId) return nbaLeagueId;
+export async function getGLeagueId() {
+  if (gLeagueId) return gLeagueId;
   let r = await pool.query(
     'SELECT id FROM leagues WHERE name = $1',
-    [NBA_LEAGUE_NAME]
+    [G_LEAGUE_NAME]
   );
   if (r.rows.length > 0) {
-    nbaLeagueId = r.rows[0].id;
-    await setNbaCountryUsa();
-    return nbaLeagueId;
+    gLeagueId = r.rows[0].id;
+    await setGLeagueCountryUsa();
+    return gLeagueId;
   }
   try {
     r = await pool.query(
       'INSERT INTO leagues (name) VALUES ($1) RETURNING id',
-      [NBA_LEAGUE_NAME]
+      [G_LEAGUE_NAME]
     );
-    nbaLeagueId = r.rows[0].id;
-    await setNbaCountryUsa();
-    return nbaLeagueId;
+    gLeagueId = r.rows[0].id;
+    await setGLeagueCountryUsa();
+    return gLeagueId;
   } catch (err) {
     if (err.code === '23505') {
       r = await pool.query(
         'SELECT id FROM leagues WHERE name = $1',
-        [NBA_LEAGUE_NAME]
+        [G_LEAGUE_NAME]
       );
       if (r.rows.length > 0) {
-        nbaLeagueId = r.rows[0].id;
-        await setNbaCountryUsa();
-        return nbaLeagueId;
+        gLeagueId = r.rows[0].id;
+        await setGLeagueCountryUsa();
+        return gLeagueId;
       }
     }
     throw err;
   }
 }
 
-async function setNbaCountryUsa() {
+async function setGLeagueCountryUsa() {
   try {
     await pool.query(
       "UPDATE leagues SET country = 'USA' WHERE name = $1",
-      [NBA_LEAGUE_NAME]
+      [G_LEAGUE_NAME]
     );
   } catch (_) {
     // Ignore if leagues.country column does not exist
@@ -62,4 +62,4 @@ export async function getOrCreateSeason(leagueId, yearStart, yearEnd) {
   return ins.rows[0].id;
 }
 
-export default { getNbaLeagueId, getOrCreateSeason };
+export default { getGLeagueId, getOrCreateSeason };

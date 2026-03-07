@@ -168,7 +168,7 @@ async function processOneJob() {
 }
 
 async function runWorker() {
-  console.log('Starting NBA scraper workers...');
+  console.log('Starting G League scraper workers...');
   await testConnection();
   console.log('Connected to Railway Postgres');
   console.log('Worker pool initialized');

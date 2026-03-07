@@ -16,7 +16,7 @@ export async function fetchPlayerProfileHtml(url) {
       const res = await axios.get(url, {
         timeout: 15000,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NBA-Scraper/1.0)',
+          'User-Agent': 'Mozilla/5.0 (compatible; G-League-Scraper/1.0)',
           'Accept': 'text/html',
         },
         validateStatus: (s) => s === 200 || s === 429 || s === 404,
@@ -167,7 +167,7 @@ function parseSeasonRowsFromTable($) {
 
 /**
  * Parse jersey numbers from div.uni_holder links (data-tip: "Team Name, Year(s)").
- * Returns only NBA teams. Year can be "2010" or "2015-2018".
+ * Returns only G League teams. Year can be "2010" or "2015-2018".
  */
 function parseJerseyNumbers($) {
   const entries = [];
@@ -232,7 +232,7 @@ function extractSeasonRowsFromTable($, $table) {
       || $tr.find('td[data-stat="team_name_abbr"] a').text().trim()
       || $tr.find('td[data-stat="team_name_abbr"]').text().trim();
     const lg = ($tr.find('td[data-stat="lg_id"]').text() || $tr.find('td[data-stat="comp_name_abbr"]').text() || '').trim();
-    if (lg && lg !== 'NBA') return;
+    if (lg === 'NBA') return;
 
     const g = parseCellNum($tr, 'g') ?? parseCellNum($tr, 'games');
     const gs = parseCellNum($tr, 'gs') ?? parseCellNum($tr, 'games_started');

@@ -1,7 +1,7 @@
 /**
- * Scrape Basketball Reference player index to collect all player profile URLs.
- * Index: https://www.basketball-reference.com/players/
- * Then each letter: /players/a/, /players/b/, ...
+ * Scrape Basketball Reference G League player index to collect all player profile URLs.
+ * Index: https://www.basketball-reference.com/gleague/players/
+ * Then each letter: /gleague/players/a/, /gleague/players/b/, ...
  */
 
 import axios from 'axios';
@@ -16,13 +16,13 @@ export async function fetchPlayerUrlsFromIndex() {
   const allUrls = new Set();
 
   for (const letter of letters) {
-    const url = `${BASE}/players/${letter}/`;
+    const url = `${BASE}/gleague/players/${letter}/`;
     await withRateLimit(async () => {
       const html = await retry(async () => {
         const res = await axios.get(url, {
           timeout: 15000,
           headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; NBA-Scraper/1.0)',
+            'User-Agent': 'Mozilla/5.0 (compatible; G-League-Scraper/1.0)',
             'Accept': 'text/html',
           },
           validateStatus: (s) => s === 200 || s === 429,
@@ -35,11 +35,11 @@ export async function fetchPlayerUrlsFromIndex() {
         return res.data;
       });
       const $ = cheerio.load(html);
-      $('table a[href*="/players/"][href$=".html"]').each((_, el) => {
+      $('a[href*="/gleague/players/"][href$=".html"]').each((_, el) => {
         const href = $(el).attr('href');
-        if (href && href.includes('/players/')) {
+        if (href && href.includes('/gleague/players/')) {
           const full = href.startsWith('http') ? href : `${BASE}${href.startsWith('/') ? '' : '/'}${href}`;
-          if (full.includes('/players/') && full.endsWith('.html')) allUrls.add(full);
+          if (full.includes('/gleague/players/') && full.endsWith('.html')) allUrls.add(full);
         }
       });
     });
@@ -49,10 +49,10 @@ export async function fetchPlayerUrlsFromIndex() {
 }
 
 /**
- * Extract sr_player_id from URL like .../players/j/jamesle01.html
+ * Extract sr_player_id from URL like .../gleague/players/j/jamesle01d.html
  */
 export function srPlayerIdFromUrl(url) {
-  const match = url.match(/\/players\/[a-z]\/([a-z0-9]+)\.html$/i);
+  const match = url.match(/\/gleague\/players\/[a-z]\/([a-z0-9]+)\.html$/i);
   return match ? match[1].toLowerCase() : null;
 }
 

@@ -4,7 +4,7 @@
  */
 
 import { insertPlayer } from '../services/playerService.js';
-import { getNbaLeagueId, getOrCreateSeason } from '../services/seasonService.js';
+import { getGLeagueId, getOrCreateSeason } from '../services/seasonService.js';
 import { getOrCreateTeam, getOrCreateTeamSeason } from '../services/teamService.js';
 import { upsertPlayerSeasonAndStats } from '../services/statsService.js';
 import { scrapePlayerProfile } from './playerProfileScraper.js';
@@ -36,7 +36,7 @@ export async function scrapeAndPersistPlayer(url) {
   }
 
   try {
-    const leagueId = await getNbaLeagueId();
+    const leagueId = await getGLeagueId();
     for (const row of seasons) {
       try {
         const seasonId = await getOrCreateSeason(leagueId, row.year_start, row.year_end);

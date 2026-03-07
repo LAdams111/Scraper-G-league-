@@ -9,7 +9,7 @@ import { pool } from '../db/db.js';
 import { fetchPlayerUrlsFromIndex } from '../scrapers/playerIndexScraper.js';
 
 async function generateJobs() {
-  console.log('Fetching player index from Basketball Reference...');
+  console.log('Fetching G League player index from Basketball Reference...');
   const urls = await fetchPlayerUrlsFromIndex();
   console.log(`Found ${urls.length} player URLs.`);
 
