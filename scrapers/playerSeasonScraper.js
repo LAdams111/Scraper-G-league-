@@ -3,7 +3,7 @@
  * Uses playerProfileScraper + seasonService, teamService, playerService, statsService.
  */
 
-import { insertPlayer } from '../services/playerService.js';
+import { insertOrMergeGLeaguePlayer } from '../services/playerService.js';
 import { getGLeagueId, getOrCreateSeason } from '../services/seasonService.js';
 import { getOrCreateTeam, getOrCreateTeamSeason } from '../services/teamService.js';
 import { upsertPlayerSeasonAndStats } from '../services/statsService.js';
@@ -25,9 +25,9 @@ export async function scrapeAndPersistPlayer(url) {
 
   let playerId;
   try {
-    playerId = await insertPlayer({ ...profile, sr_player_id });
+    playerId = await insertOrMergeGLeaguePlayer(profile, sr_player_id);
   } catch (err) {
-    console.error('[scraper] insertPlayer error, skipping row:', err.message);
+    console.error('[scraper] insertOrMergeGLeaguePlayer error, skipping row:', err.message);
     return { ok: false, reason: 'insert_failed', url };
   }
 
