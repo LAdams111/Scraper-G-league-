@@ -24,6 +24,14 @@ npm run migrate
    npm run generate-jobs
    ```
 
+   To **clear the queue and refill with the full index** (~5,400 players), use:
+
+   ```bash
+   npm run regenerate-jobs
+   ```
+
+   Use `regenerate-jobs` after a fresh deploy or if team rosters in Hoop Central look incomplete (only ~800 players instead of thousands).
+
 2. **Run workers** – Process the queue (run in one or more terminals for parallel workers):
 
    ```bash
@@ -62,11 +70,12 @@ jobs/         # generatePlayerJobs, runPlayerWorkers
 
 ## Commands
 
-| Command              | Description                          |
-|----------------------|--------------------------------------|
-| `npm run migrate`    | Apply schema (creates tables if missing) |
-| `npm run generate-jobs` | Enqueue all player URLs from index   |
-| `npm run workers`    | Run a single worker (run multiple for concurrency) |
+| Command                  | Description                                                |
+|--------------------------|------------------------------------------------------------|
+| `npm run migrate`        | Apply schema (creates tables if missing)                   |
+| `npm run generate-jobs` | Enqueue all player URLs from index (skips existing URLs)   |
+| `npm run regenerate-jobs` | Clear job queue and enqueue full index (~5,400 players)  |
+| `npm run workers`       | Run a single worker (run multiple for concurrency)        |
 
 ## Railway: player_scrape_jobs schema
 

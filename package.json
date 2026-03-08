@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node jobs/runPlayerWorkers.js",
     "generate-jobs": "node jobs/generatePlayerJobs.js",
+    "regenerate-jobs": "node jobs/regeneratePlayerJobs.js",
     "workers": "node jobs/runPlayerWorkers.js",
     "migrate": "node db/migrate.js",
     "clear-players": "node db/clearPlayers.js"
