@@ -1,8 +1,7 @@
 /**
  * Worker: claim a pending job for this league, scrape player, persist, mark complete/failed.
  * Run with: npm start (Railway) or npm run workers.
- * Set SCRAPER_LEAGUE=nba or SCRAPER_LEAGUE=gleague. Only NBA and G League are supported.
- * WNBA uses the same database but a separate Scraper-WNBA service.
+ * Set SCRAPER_LEAGUE=nba or SCRAPER_LEAGUE=gleague so this worker only processes that league's jobs.
  * Auto-detects schema: uses player_url or url for the URL column.
  */
 
