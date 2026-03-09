@@ -1,6 +1,8 @@
 # Scraper-NBA
 
-Production-ready NBA scraper for [Basketball Reference](https://www.basketball-reference.com). Scrapes all NBA player data and stores it in PostgreSQL.
+Production-ready NBA scraper for [Basketball Reference](https://www.basketball-reference.com). Scrapes NBA (and optionally G League) player data and stores it in PostgreSQL.
+
+**This scraper is for NBA and G League only.** The database may also contain WNBA as a league and WNBA player data; that data is written by a **separate Scraper-WNBA service** (same database, different repo/deployment). This project never enqueues or processes WNBA jobs.
 
 ## Requirements
 
@@ -18,16 +20,17 @@ npm run migrate
 
 ## Usage
 
-1. **Generate jobs** – Fetch all player URLs from Basketball Reference and enqueue them:
+1. **Generate jobs** – Fetch NBA (or G League) player URLs and enqueue them:
 
    ```bash
-   npm run generate-jobs
+   SCRAPER_LEAGUE=nba npm run generate-jobs   # default
+   # or SCRAPER_LEAGUE=gleague npm run generate-jobs
    ```
 
-   To **clear the queue and refill with the full index** (~5,400 players), use:
+   To **clear this league's queue and refill** (~5,400 NBA players; WNBA jobs are never touched):
 
    ```bash
-   npm run regenerate-jobs
+   SCRAPER_LEAGUE=nba npm run regenerate-jobs
    ```
 
    Use `regenerate-jobs` after a fresh deploy or if team rosters in Hoop Central look incomplete (only ~800 players instead of thousands).
@@ -35,7 +38,7 @@ npm run migrate
 2. **Run workers** – Process the queue (run in one or more terminals for parallel workers):
 
    ```bash
-   npm run workers
+   SCRAPER_LEAGUE=nba npm run workers   # or SCRAPER_LEAGUE=gleague
    ```
 
 Workers run until the queue is empty, then poll for new jobs every few seconds.
